@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const { message } = await request.json();
-  console.log("Received message:", message);
-
   try {
+    const { message } = await request.json();
+    if (!message) {
+      return NextResponse.json({ error: "Message is required" }, { status: 400 });
+    }
+    console.log("Received message:", message);
+
     const response = await fetch("http://127.0.0.1:8000/predict", {
       method: "POST",
       headers: {
@@ -27,9 +30,14 @@ export async function POST(request: Request) {
       predicted_class: data.predicted_class,
     });
   } catch (err) {
-    console.error("Error calling FastAPI:", err);
+    let errorMessage = "Failed to process chat message.";
+    if (err instanceof SyntaxError) {
+      // This error is often thrown by request.json()
+      errorMessage = "Invalid JSON in request body.";
+    }
+    console.error("Error in /api/chat:", err);
     return NextResponse.json(
-      { error: "Failed to call prediction service" },
+      { error: errorMessage },
       { status: 500 }
     );
   }

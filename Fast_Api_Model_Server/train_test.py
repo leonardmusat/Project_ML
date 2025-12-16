@@ -14,6 +14,9 @@ y_train_all = np.load("data/matrix/y_total.npy", allow_pickle=True)
 # === Load TF-IDF vectorizer ===
 vectorizer = joblib.load("models/tfidf_vectorizer.pkl")
 
+# === Load svd ===
+svd = joblib.load("models/tfidf_svd_100.pkl")
+
 # === Load encoder ===
 encoder = joblib.load("models/label_encoder.pkl")
 
@@ -42,4 +45,9 @@ print("Model trained: 100% of data used for training.")
 
 joblib.dump(model_all, "models/svm_classifier_all.pkl")
 print("Model saved as svm_classifier.pkl")
+
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+cm = confusion_matrix(y_test, preds)
+print("Confusion Matrix:")
+print(cm)
 

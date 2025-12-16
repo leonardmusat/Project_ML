@@ -28,7 +28,7 @@ export default function Home() {
         }
 
         const data = await response.json();
-        setChatMessages((prevMessages) => [...prevMessages, `Bot: ${data.response}`]);
+        setChatMessages((prevMessages) => [...prevMessages, `The predicted class for "${data.requirement}" is "${data.predicted_class}"`]);
       } catch (error) {
         console.error("Error sending message:", error);
         setChatMessages((prevMessages) => [

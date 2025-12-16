@@ -1,46 +1,44 @@
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
-import joblib
-import os
+from sklearn.decomposition import TruncatedSVD
+import joblib, os
 
 custom_stopwords = [
-    "in", "on", "at", "to", "from",
-    "and", "or", "but",
-    "the", "a", "an",
-    "of", "for", "with",
-    "by", "as", "is", "are", "be"
+    "in","on","at","to","from","and","or","but","the","a","an",
+    "of","for","with","by","as","is","are","be"
 ]
 
-# Load your CSV
-df = pd.read_csv("data/PROMISE_exp.csv")
-
-# Extract your texts and classes
+df = pd.read_csv("data/new_dataset.csv")
 texts = df["RequirementText"].astype(str)
-labels = df["_class_"]          # or whatever your label column is called
+labels = df["_class_"]
 
-# Build TF-IDF matrix
 vectorizer = TfidfVectorizer(
-    min_df=5,      # ignore words appearing in < 5 requirements
-    max_df=0.90,   # ignore words appearing in > 90% requirements
+    min_df=5,
+    max_df=0.90,
     stop_words=custom_stopwords
 )
-tfidf_matrix = vectorizer.fit_transform(texts)
 
-# Convert TF-IDF to DataFrame
-tfidf_df = pd.DataFrame(
-    tfidf_matrix.toarray(),
-    columns=vectorizer.get_feature_names_out()
-)
+X_tfidf = vectorizer.fit_transform(texts)   # sparse matrix
 
+# --- Save vectorizer
 os.makedirs("models", exist_ok=True)
 joblib.dump(vectorizer, "models/tfidf_vectorizer.pkl")
 
-# Add RequirementText and Class
-tfidf_df.insert(0, "RequirementText", texts)
-tfidf_df["Class"] = labels
+# --- Apply SVD (dense ndarray)
+svd = TruncatedSVD(n_components=100, random_state=42)
+X_svd = svd.fit_transform(X_tfidf)
 
-# Save the full structured CSV
-tfidf_df.to_csv("data/requirements_tfidf_full_dataset.csv", index=False)
+# --- Save SVD too (so you can reuse it later!)
+joblib.dump(svd, "models/tfidf_svd_100.pkl")
 
-print("Done! CSV saved as requirements_tfidf_full_dataset.csv")
+# --- Convert reduced output to DataFrame
+reduced_tfidf_df = pd.DataFrame(
+    X_svd,
+    columns=[f"Component_{i}" for i in range(1, 101)]
+)
 
+reduced_tfidf_df.insert(0, "RequirementText", texts)
+reduced_tfidf_df["Class"] = labels
+
+reduced_tfidf_df.to_csv("data/requirements_tfidf_reduced_dataset.csv", index=False)
+print("Done! CSV saved as requirements_tfidf_reduced_dataset.csv")
