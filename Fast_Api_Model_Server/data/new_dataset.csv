@@ -880,7 +880,7 @@ ProjectID,RequirementText,_class_
 51,"The system shall have high availability every day of the year.The system must be available for use between",A
 51,"The product shall be available 99% of the time.",A
 52,"The System must be available to users: from <xx:00> to <xx:00>; on <all weekdays/xxx days per year>.",A
-52,"The planned downtime for the System must not exceed <xx> hours per <rolling three month period>.",A 
+52,"The planned downtime for the System must not exceed <xx> hours per <rolling three month period>.",A
 52,"The System shall be considered to be down if any user is unable to perform any normal System function.",A
 52,"The System shall be considered to be down if this failure is attributed to any component of the System other than the workstation.",A
 52,"Unplanned downtime for the System must not exceed <xx hours/minutes> per <rolling three month period>.",A
