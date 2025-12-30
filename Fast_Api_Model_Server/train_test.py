@@ -2,6 +2,8 @@ import numpy as np
 import joblib
 from sklearn.svm import LinearSVC
 from sklearn.metrics import accuracy_score, classification_report
+from sklearn.model_selection import StratifiedKFold, cross_validate
+
 
 # === Load matrices ===
 X_train = np.load("data/matrix/X_train.npy")
@@ -14,6 +16,8 @@ X_train_nonfunc = np.load("data/matrix/X_train_nonfunc.npy")
 X_test_nonfunc = np.load("data/matrix/X_test_nonfunc.npy")
 y_train_nonfunc = np.load("data/matrix/y_train_nonfunc.npy", allow_pickle=True)
 y_test_nonfunc = np.load("data/matrix/y_test_nonfunc.npy", allow_pickle=True)
+X_train_all_nonfunc = np.load("data/matrix/X_total_nonfunc.npy")
+y_train_all_nonfunc = np.load("data/matrix/y_total_nonfunc.npy", allow_pickle=True)
 
 # === Load TF-IDF vectorizer ===
 vectorizer = joblib.load("models/tfidf_vectorizer.pkl")
@@ -73,3 +77,31 @@ cm = confusion_matrix(y_test, preds)
 print("Confusion Matrix:")
 print(cm)
 
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+scoring = ['accuracy', 'precision_weighted', 'recall_weighted', 'f1_weighted']
+cv_results = cross_validate(model_all, X_train_all, y_train_all, cv=cv, scoring=scoring)
+
+print("Cross-validation results:")
+print("Accuracy:", cv_results['test_accuracy'].mean())
+print("Precision:", cv_results['test_precision_weighted'].mean())
+print("Recall:", cv_results['test_recall_weighted'].mean())
+print("F1-score:", cv_results['test_f1_weighted'].mean())  
+
+# === Train SVM model on non-functional 100% data ===
+model_all_nonfunc = LinearSVC()
+model_all_nonfunc.fit(X_train_all_nonfunc, y_train_all_nonfunc)
+print("Model trained: Non-functional requirements only. 100% of data used for training.")
+
+joblib.dump(model_all_nonfunc, "models/svm_classifier_all_nonfunctional.pkl")
+print("Model saved as svm_classifier_all_nonfunctional.pkl")
+
+cm = confusion_matrix(y_test_nonfunc, preds_nonfunc)
+print("Confusion Matrix:")
+print(cm)
+
+cv_results_nonfunc = cross_validate(model_all_nonfunc, X_train_all_nonfunc, y_train_all_nonfunc, cv=cv, scoring=scoring)
+print("Cross-validation results (Non-Functional):")
+print("Accuracy:", cv_results_nonfunc['test_accuracy'].mean())
+print("Precision:", cv_results_nonfunc['test_precision_weighted'].mean())
+print("Recall:", cv_results_nonfunc['test_recall_weighted'].mean())
+print("F1-score:", cv_results_nonfunc['test_f1_weighted'].mean())   
