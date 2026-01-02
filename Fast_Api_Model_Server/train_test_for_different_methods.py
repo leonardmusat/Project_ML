@@ -6,6 +6,7 @@ from sklearn.model_selection import StratifiedKFold, cross_validate
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.neighbors import KNeighborsClassifier as KnnClassifier
 from sklearn.linear_model import LogisticRegression, SGDClassifier
+from sklearn.ensemble import VotingClassifier
 
 # === Load matrices ===
 X_train = np.load("data/matrix/X_train.npy")
@@ -33,6 +34,8 @@ nonfunctional_encoder = joblib.load("models/nonfunctional_encoder.pkl")
 
 print("Data loaded successfully.")
 
+scoring = ['accuracy', 'precision_weighted', 'recall_weighted', 'f1_weighted']
+
 def create_and_evaluate_model_80_20(model, X_train, y_train, X_test, y_test):
     model.fit(X_train, y_train)
     print("Model trained: 80% of data used for training.")
@@ -51,7 +54,6 @@ def create_and_evaluate_model_100_crossval(model, X_train_all, y_train_all):
     model.fit(X_train_all, y_train_all)
     print("Model trained: 100% of data used for training.")
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-    scoring = ['accuracy', 'precision_weighted', 'recall_weighted', 'f1_weighted']
     cv_results = cross_validate(model, X_train_all, y_train_all, cv=cv, scoring=scoring)
 
     print("Cross-validation results:")
@@ -62,10 +64,6 @@ def create_and_evaluate_model_100_crossval(model, X_train_all, y_train_all):
 
     return model, preds
 
-
-
-
-model_sgd = SGDClassifier(max_iter=1000, tol=1e-3, class_weight='balanced')
 
 print("Data for 80%/20% binary classification:")
 print("Clasifier: SVM")
@@ -80,7 +78,7 @@ print("Clasifier: KNN")
 model_knn = KnnClassifier()
 model_knn, preds_knn = create_and_evaluate_model_80_20(model_knn, X_train, y_train, X_test, y_test)
 print(binary_encoder.classes_)
-#joblib.dump(model_knn, "models/knn_classifier.pkl")
+joblib.dump(model_knn, "models/knn_classifier.pkl")
 print("KNN Model saved as knn_classifier.pkl")  
 
 print("\n\n")
@@ -88,14 +86,15 @@ print("Clasifier: Logistic Regression")
 model_lr = LogisticRegression(max_iter=1000, class_weight='balanced')
 model_lr, preds_lr = create_and_evaluate_model_80_20(model_lr, X_train, y_train, X_test, y_test)
 print(binary_encoder.classes_)
-#joblib.dump(model_lr, "models/logistic_regression_classifier.pkl")
+joblib.dump(model_lr, "models/logistic_regression_classifier.pkl")
 print("Model saved as logistic_regression_classifier.pkl")
 
 print("\n\n")
 print("Clasifier: SGD")
+model_sgd = SGDClassifier(max_iter=1000, tol=1e-3, class_weight='balanced', random_state=42, average=True)
 model_sgd, preds_sgd = create_and_evaluate_model_80_20(model_sgd, X_train, y_train, X_test, y_test)
 print(binary_encoder.classes_)
-#joblib.dump(model_sgd, "models/sgd_classifier.pkl")
+joblib.dump(model_sgd, "models/sgd_classifier.pkl")
 print("Model saved as sgd_classifier.pkl") 
 
 print("\n\n")
@@ -114,7 +113,7 @@ print("Clasifier: KNN")
 model_knn_nonfunc = KnnClassifier()
 model_knn_nonfunc, preds_knn_nonfunc = create_and_evaluate_model_80_20(model_knn_nonfunc, X_train_nonfunc, y_train_nonfunc, X_test_nonfunc, y_test_nonfunc)
 print(nonfunctional_encoder.classes_)
-#joblib.dump(model_knn_nonfunc, "models/knn_classifier_nonfunctional.pkl")
+joblib.dump(model_knn_nonfunc, "models/knn_classifier_nonfunctional.pkl")
 print("Non-Functional KNN Model saved as knn_classifier_nonfunctional.pkl")  
 
 print("\n\n")
@@ -122,15 +121,15 @@ print("Clasifier: Logistic Regression")
 model_lr_nonfunc = LogisticRegression(max_iter=1000, class_weight='balanced')
 model_lr_nonfunc, preds_lr_nonfunc = create_and_evaluate_model_80_20(model_lr_nonfunc, X_train_nonfunc, y_train_nonfunc, X_test_nonfunc, y_test_nonfunc)
 print(nonfunctional_encoder.classes_)
-#joblib.dump(model_lr_nonfunc, "models/logistic_regression_classifier_nonfunctional.pkl")
+joblib.dump(model_lr_nonfunc, "models/logistic_regression_classifier_nonfunctional.pkl")
 print("Non-Functional Model saved as logistic_regression_classifier_nonfunctional.pkl")
 
 print("\n\n")
 print("Clasifier: SGD Classifier")
-model_sgd_nonfunc = SGDClassifier(max_iter=1000, tol=1e-3, class_weight='balanced')
+model_sgd_nonfunc = SGDClassifier(max_iter=1000, tol=1e-3, class_weight='balanced', random_state=41, average= True)
 model_sgd_nonfunc, preds_sgd_nonfunc = create_and_evaluate_model_80_20(model_sgd_nonfunc, X_train_nonfunc, y_train_nonfunc, X_test_nonfunc, y_test_nonfunc)
 print(nonfunctional_encoder.classes_)
-#joblib.dump(model_sgd_nonfunc, "models/sgd_classifier_nonfunctional.pkl")
+joblib.dump(model_sgd_nonfunc, "models/sgd_classifier_nonfunctional.pkl")
 print("Non-Functional Model saved as sgd_classifier_nonfunctional.pkl") 
 
 print("\n\n")
@@ -147,22 +146,22 @@ print("\n\n")
 print("Clasifier: Knn")
 model_knn_all = KnnClassifier()
 model_knn_all, preds_knn_all = create_and_evaluate_model_100_crossval(model_knn_all, X_train_all, y_train_all)
-#joblib.dump(model_knn_all, "models/knn_classifier_all.pkl")
+joblib.dump(model_knn_all, "models/knn_classifier_all.pkl")
 print("KNN Model saved as knn_classifier_all.pkl") 
 
 print("\n\n")
 print("Clasifier: Logistic Regression") 
 model_lr_all = LogisticRegression(max_iter=1000, class_weight='balanced')
 model_lr_all, preds_lr_all = create_and_evaluate_model_100_crossval(model_lr_all, X_train_all, y_train_all)
-#joblib.dump(model_lr_all, "models/logistic_regression_classifier_all.pkl")
+joblib.dump(model_lr_all, "models/logistic_regression_classifier_all.pkl")
 print("Model saved as logistic_regression_classifier_all.pkl")
 
 print("\n\n")
 print("Clasifier: SGD Classifier")
 
-model_sgd_all = SGDClassifier(max_iter=1000, tol=1e-3, class_weight='balanced')
+model_sgd_all = SGDClassifier(max_iter=1000, tol=1e-3, class_weight='balanced', random_state=42, average = True)
 model_sgd_all, preds_sgd_all = create_and_evaluate_model_100_crossval(model_sgd_all, X_train_all, y_train_all)
-#joblib.dump(model_sgd_all, "models/sgd_classifier_all.pkl")
+joblib.dump(model_sgd_all, "models/sgd_classifier_all.pkl")
 print("Model saved as sgd_classifier_all.pkl")
 
 print("\n\n")
@@ -179,19 +178,43 @@ print("\n\n")
 print("Clasifier: KNN")
 model_knn_all_nonfunc = KnnClassifier()
 model_knn_all_nonfunc, preds_knn_all_nonfunc = create_and_evaluate_model_100_crossval(model_knn_all_nonfunc, X_train_all_nonfunc, y_train_all_nonfunc)
-#joblib.dump(model_knn_all_nonfunc, "models/knn_classifier_all_nonfunctional.pkl")
+joblib.dump(model_knn_all_nonfunc, "models/knn_classifier_all_nonfunctional.pkl")
 print("Non-Functional KNN Model saved as knn_classifier_all_nonfunctional.pkl")
 
 print("\n\n")
 print("Clasifier: Logistic Regression") 
 model_lr_all_nonfunc = LogisticRegression(max_iter=1000, class_weight='balanced')
 model_lr_all_nonfunc, preds_lr_all_nonfunc = create_and_evaluate_model_100_crossval(model_lr_all_nonfunc, X_train_all_nonfunc, y_train_all_nonfunc)
-#joblib.dump(model_lr_all_nonfunc, "models/logistic_regression_classifier_all_nonfunctional.pkl")
+joblib.dump(model_lr_all_nonfunc, "models/logistic_regression_classifier_all_nonfunctional.pkl")
 print("Non-Functional Model saved as logistic_regression_classifier_all_nonfunctional.pkl")
 
 print("\n\n")
 print("Clasifier: SGD Classifier")
-model_sgd_all_nonfunc = SGDClassifier(max_iter=1000, tol=1e-3, class_weight='balanced')
+model_sgd_all_nonfunc = SGDClassifier(max_iter=1000, tol=1e-3, class_weight='balanced', random_state=42, average = True)
 model_sgd_all_nonfunc, preds_sgd_all_nonfunc = create_and_evaluate_model_100_crossval(model_sgd_all_nonfunc, X_train_all_nonfunc, y_train_all_nonfunc)
-#joblib.dump(model_sgd_all_nonfunc, "models/sgd_classifier
+joblib.dump(model_sgd_all_nonfunc, "models/sgd_classifier_all_nonfunctional.pkl")
 print("Non-Functional Model saved as sgd_classifier_all_nonfunctional.pkl")
+
+voter_model_binary = VotingClassifier(
+    estimators=[
+        ("svm", model_all),
+        ("lr", model_lr_all),
+        ("sgd", model_sgd_all),
+    ],
+    voting="hard"
+)
+
+print("\n\n")
+voter_model_binary, preds_voter = create_and_evaluate_model_100_crossval(voter_model_binary, X_train_all, y_train_all)
+print("\n\n")
+
+voter_model_nonfunc = VotingClassifier(
+    estimators=[
+        ("svm", model_all_nonfunc),
+        ("lr", model_lr_all_nonfunc),
+        ("sgd", model_sgd_all_nonfunc),
+    ],
+    voting="hard"
+)
+
+voter_model_nonfunc, preds_voter_nonfunc = create_and_evaluate_model_100_crossval(voter_model_nonfunc, X_train_all_nonfunc, y_train_all_nonfunc)
