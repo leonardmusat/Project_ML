@@ -2,19 +2,19 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
-    const { message } = await request.json();
+    const { message, model } = await request.json();
     if (!message) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 });
     }
-    console.log("Received message:", message);
+    console.log("Received message:", message, "with model:", model);
 
     const response = await fetch("http://127.0.0.1:8000/predict", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      // This matches the Pydantic model: Requirement(requirement_text: str)
-      body: JSON.stringify({ requirement_text: message }),
+      // This matches the Pydantic model: Requirement(requirement_text: str, model: str)
+      body: JSON.stringify({ requirement_text: message, model: model }),
     });
 
     if (!response.ok) {

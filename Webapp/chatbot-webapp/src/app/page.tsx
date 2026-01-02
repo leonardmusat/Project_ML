@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import ModelSelector from "../components/ModelSelector";
 
 export default function Home() {
   const [inputMessage, setInputMessage] = useState("");
   const [chatMessages, setChatMessages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedModel, setSelectedModel] = useState("Model1");
 
   const handleSendMessage = async () => {
     if (inputMessage.trim()) {
@@ -20,7 +22,7 @@ export default function Home() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ message: inputMessage }),
+          body: JSON.stringify({ message: inputMessage, model: selectedModel }),
         });
 
         if (!response.ok) {
@@ -43,8 +45,12 @@ export default function Home() {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900">
-      <header className="bg-blue-600 text-white p-4 shadow-md">
+      <header className="bg-blue-600 text-white p-4 shadow-md flex justify-between items-center">
         <h1 className="text-xl font-semibold">Chatbot</h1>
+        <ModelSelector
+          selectedModel={selectedModel}
+          setSelectedModel={setSelectedModel}
+        />
       </header>
       <main className="flex-1 overflow-y-auto p-4 space-y-2">
         {chatMessages.map((message, index) => (
