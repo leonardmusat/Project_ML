@@ -206,6 +206,9 @@ voter_model_binary = VotingClassifier(
 
 print("\n\n")
 voter_model_binary, preds_voter = create_and_evaluate_model_100_crossval(voter_model_binary, X_train_all, y_train_all)
+joblib.dump(voter_model_binary, "models/voter_classifier_all.pkl")
+print("Model saved as voter_classifier_all.pkl")
+
 print("\n\n")
 
 voter_model_nonfunc = VotingClassifier(
@@ -218,3 +221,5 @@ voter_model_nonfunc = VotingClassifier(
 )
 
 voter_model_nonfunc, preds_voter_nonfunc = create_and_evaluate_model_100_crossval(voter_model_nonfunc, X_train_all_nonfunc, y_train_all_nonfunc)
+joblib.dump(voter_model_nonfunc, "models/voter_classifier_all_nonfunctional.pkl")
+print("Model saved as voter_classifier_all_nonfunctional.pkl")
