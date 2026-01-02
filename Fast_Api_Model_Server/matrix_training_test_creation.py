@@ -26,7 +26,7 @@ dictionary_requirements = {
 nonfunctinal_classes = ["A", "LF", "O", "PE", "SE", "US"]
 
 # Load processed TF-IDF dataset
-df = pd.read_csv("data/requirements_tfidf_reduced_dataset.csv")
+df = pd.read_csv("data/requirements_tfidf_ngram_range_dataset.csv")
 
 # Split features and labels
 X_df = df.drop(columns=["RequirementText", "Class"])

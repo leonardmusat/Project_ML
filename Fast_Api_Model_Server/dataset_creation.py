@@ -13,7 +13,8 @@ texts = df["RequirementText"].astype(str)
 labels = df["_class_"]
 
 vectorizer = TfidfVectorizer(
-    min_df=5,
+    ngram_range=(1, 2),
+    min_df=3,
     max_df=0.90,
     stop_words=custom_stopwords
 )
@@ -22,23 +23,13 @@ X_tfidf = vectorizer.fit_transform(texts)   # sparse matrix
 
 # --- Save vectorizer
 os.makedirs("models", exist_ok=True)
-joblib.dump(vectorizer, "models/tfidf_vectorizer.pkl")
-
-# --- Apply SVD (dense ndarray)
-svd = TruncatedSVD(n_components=100, random_state=42)
-X_svd = svd.fit_transform(X_tfidf)
-
-# --- Save SVD too (so you can reuse it later!)
-joblib.dump(svd, "models/tfidf_svd_100.pkl")
+joblib.dump(vectorizer, "models/tfidf_vectorizer_ngram_range.pkl")
 
 # --- Convert reduced output to DataFrame
-reduced_tfidf_df = pd.DataFrame(
-    X_svd,
-    columns=[f"Component_{i}" for i in range(1, 101)]
-)
+reduced_tfidf_df = pd.DataFrame(X_tfidf.toarray(), columns=vectorizer.get_feature_names_out())
 
 reduced_tfidf_df.insert(0, "RequirementText", texts)
 reduced_tfidf_df["Class"] = labels
 
-reduced_tfidf_df.to_csv("data/requirements_tfidf_reduced_dataset.csv", index=False)
-print("Done! CSV saved as requirements_tfidf_reduced_dataset.csv")
+reduced_tfidf_df.to_csv("data/requirements_tfidf_ngram_range_dataset.csv", index=False)
+print("Done! CSV saved as requirements_tfidf_ngram_range_dataset.csv")
