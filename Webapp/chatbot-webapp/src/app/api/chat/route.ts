@@ -14,7 +14,7 @@ export async function POST(request: Request) {
         "Content-Type": "application/json",
       },
       // This matches the Pydantic model: Requirement(requirement_text: str, model: str)
-      body: JSON.stringify({ requirement_text: message, model: model }),
+      body: JSON.stringify({req: { requirement_text: message }, model: { name: model },}),
     });
 
     if (!response.ok) {

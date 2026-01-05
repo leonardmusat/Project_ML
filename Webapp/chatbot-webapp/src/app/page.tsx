@@ -7,11 +7,11 @@ export default function Home() {
   const [inputMessage, setInputMessage] = useState("");
   const [chatMessages, setChatMessages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedModel, setSelectedModel] = useState("Model1");
+  const [selectedModel, setSelectedModel] = useState("SVM");
 
-  const handleSendMessage = async () => {
-    if (inputMessage.trim()) {
-      const userMessage = `You: ${inputMessage}`;
+  const handleSendMessage = async (message: string) => {
+    if (message.trim()) {
+      const userMessage = `You: ${message}`;
       setChatMessages((prevMessages) => [...prevMessages, userMessage]);
       setInputMessage("");
       setIsLoading(true);
@@ -22,7 +22,7 @@ export default function Home() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ message: inputMessage, model: selectedModel }),
+          body: JSON.stringify({ message: message, model: selectedModel }),
         });
 
         if (!response.ok) {
@@ -41,6 +41,11 @@ export default function Home() {
         setIsLoading(false);
       }
     }
+  };
+
+  const handleSendRequirement = () => {
+    const requirement = "The chatbot shall generate and deliver a response within 2 seconds for at least 95% of user requests under normal operating conditions.";
+    handleSendMessage(requirement);
   };
 
   return (
@@ -80,17 +85,24 @@ export default function Home() {
           onChange={(e) => setInputMessage(e.target.value)}
           onKeyPress={(e) => {
             if (e.key === "Enter" && !isLoading) {
-              handleSendMessage();
+              handleSendMessage(inputMessage);
             }
           }}
           disabled={isLoading}
         />
         <button
           className="bg-blue-600 text-white p-2 rounded-r-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-          onClick={handleSendMessage}
+          onClick={() => handleSendMessage(inputMessage)}
           disabled={isLoading}
         >
           Send
+        </button>
+        <button
+          className="bg-green-600 text-white p-2 ml-2 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50"
+          onClick={handleSendRequirement}
+          disabled={isLoading}
+        >
+          Show a requirement
         </button>
       </footer>
     </div>

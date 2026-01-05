@@ -6,7 +6,7 @@ interface ModelSelectorProps {
 }
 
 export default function ModelSelector({ selectedModel, setSelectedModel }: ModelSelectorProps) {
-  const models = ["LinaerSVM", "Logistic Regression", "SGD", "All Models"];
+  const models = ["SVM", "Logistic Regression", "SGD", "All Models"];
 
   return (
     <div className="flex items-center space-x-2">
