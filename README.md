@@ -110,7 +110,7 @@ Users can:
 | Performance (PE) | 82 |
 | Security (SE) | 125 |
 | Usability (US) | 85 |
-| **Total** | **878** |
+| **Total** | **955** |
 
 ---
 
