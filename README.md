@@ -103,7 +103,7 @@ Users can:
 | Class | Count |
 |------|------|
 | Functional (F) | 444 |
-| Nonfunctional (NF) | 434 |
+| Nonfunctional (NF) | 511 |
 | Availability (A) | 82 |
 | Look and Feel (LF) | 60 |
 | Operability (O) | 77 |
